@@ -1,0 +1,20 @@
+import numpy as np
+from neuron import SyntheticNeuron
+
+class NeuralNetwork:
+    def __init__(self, N):
+        self.neurons = [
+            SyntheticNeuron(frequency=5 + i, threshold=np.random.uniform(1.4, 1.8), id=i)
+            for i in range(N)
+        ]
+        self.history = [[] for _ in range(N)]
+
+    def run(self, time_array, external_stimuli_fn=None):
+        for t in time_array:
+            outputs = [n.I for n in self.neurons]
+            avg_feedback = np.mean(outputs)
+
+            for i, neuron in enumerate(self.neurons):
+                stimulus = external_stimuli_fn(t) if external_stimuli_fn else 0.0
+                value = neuron.update(t, peer_input=avg_feedback, external_stimulus=stimulus)
+                self.history[i].append(value)
